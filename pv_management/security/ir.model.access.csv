@@ -1,0 +1,12 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_pv_installation,pv.installation,model_pv_installation,,1,1,1,1
+access_pv_module,pv.module,model_pv_module,,1,1,1,1
+access_pv_inverter,pv.inverter,model_pv_inverter,,1,1,1,1
+access_configuration_district_steg,configuration.district.steg,model_configuration_district_steg,,1,1,1,1
+access_alarm_management,alarm.management,model_alarm_management,,1,1,1,1
+access_marque_onduleur,marque.onduleur,model_marque_onduleur,,1,1,1,1
+access_reclamation,reclamation,model_reclamation,,1,1,1,1
+access_fiche_intervention,fiche.intervention,model_fiche_intervention,,1,1,1,1
+access_agenda_intervention_line,agenda.intervention.line,model_agenda_intervention_line,,1,1,1,1
+access_pv_evaluation,pv.evaluation,model_pv_evaluation,,1,1,1,1
+access_fiche_reponse,fiche.reponse,model_fiche_reponse,,1,1,1,1

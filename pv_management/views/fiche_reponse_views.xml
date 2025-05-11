@@ -1,0 +1,98 @@
+<odoo>
+    <!-- Form View -->
+    <record id="view_fiche_reponse_form" model="ir.ui.view">
+        <field name="name">fiche.reponse.form</field>
+        <field name="model">fiche.reponse</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_view_intervention" string="Voir l'intervention" type="object" class="oe_highlight" icon="fa-arrow-left"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="intervention_id"/>
+                            <field name="installation_id"/>
+                            <field name="type_intervention"/>
+                            <field name="date_cloture"/>
+                        </group>
+                        <group>
+                            <field name="montant_a_payer"/>
+                            <field name="est_paye"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Équipe d'intervention">
+                            <field name="equipe_intervention_ids" widget="many2many_tags"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_fiche_reponse_tree" model="ir.ui.view">
+        <field name="name">fiche.reponse.tree</field>
+        <field name="model">fiche.reponse</field>
+        <field name="arch" type="xml">
+            <tree decoration-success="est_paye == 'oui'" decoration-warning="est_paye == 'non'">
+                <field name="name"/>
+                <field name="intervention_id"/>
+                <field name="installation_id"/>
+                <field name="date_cloture"/>
+                <field name="montant_a_payer"/>
+                <field name="est_paye"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_fiche_reponse_search" model="ir.ui.view">
+        <field name="name">fiche.reponse.search</field>
+        <field name="model">fiche.reponse</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="intervention_id"/>
+                <field name="installation_id"/>
+                <separator/>
+                <filter string="Payé" name="est_paye_oui" domain="[('est_paye','=','oui')]"/>
+                <filter string="Non Payé" name="est_paye_non" domain="[('est_paye','=','non')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_by_paye" string="État de Paiement" context="{'group_by': 'est_paye'}"/>
+                    <filter name="group_by_installation" string="Installation" context="{'group_by': 'installation_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_fiche_reponse" model="ir.actions.act_window">
+        <field name="name">Fiches de Réponse</field>
+        <field name="res_model">fiche.reponse</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fiche_reponse_search"/>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_fiche_reponse" name="Fiches de Réponse" parent="menu_pv_root" action="action_fiche_reponse"/>
+
+    <!-- Sequence pour la numérotation automatique -->
+    <record id="sequence_fiche_reponse" model="ir.sequence">
+        <field name="name">Séquence de fiche de réponse</field>
+        <field name="code">fiche.reponse.sequence</field>
+        <field name="prefix">REP/</field>
+        <field name="padding">5</field>
+    </record>
+</odoo>

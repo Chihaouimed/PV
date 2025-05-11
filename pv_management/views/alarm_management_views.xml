@@ -1,0 +1,67 @@
+<odoo>
+    <!-- Alarm Management Form View -->
+    <record id="view_alarm_management_form" model="ir.ui.view">
+        <field name="name">alarm.management.form</field>
+        <field name="model">alarm.management</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="partie"/>
+                        <field name="marque_onduleur_id" attrs="{'invisible': [('partie', '!=', 'onduleur')], 'required': [('partie', '=', 'onduleur')]}"/>
+                        <field name="code_alarm"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Alarm Management Tree View -->
+    <record id="view_alarm_management_tree" model="ir.ui.view">
+        <field name="name">alarm.management.tree</field>
+        <field name="model">alarm.management</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="partie"/>
+                <field name="marque_onduleur_id"/>
+                <field name="code_alarm"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Alarm Management Search View -->
+    <record id="view_alarm_management_search" model="ir.ui.view">
+        <field name="name">alarm.management.search</field>
+        <field name="model">alarm.management</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="code_alarm"/>
+                 <field name="partie"/>
+    <separator/>
+    <filter string="Onduleur Alarms" name="filter_partie_onduleur" domain="[('partie','=','onduleur')]"/>
+    <filter string="Module Alarms" name="filter_partie_module" domain="[('partie','=','module')]"/>
+    <group expand="0" string="Group By">
+        <filter name="group_by_partie" string="Partie" context="{'group_by': 'partie'}"/>
+        <filter name="group_by_marque" string="Marque" context="{'group_by': 'marque_onduleur_id'}"/>
+    </group>
+            </search>
+        </field>
+    </record>
+
+
+
+    <!-- Actions -->
+    <record id="action_alarm_management" model="ir.actions.act_window">
+        <field name="name">Gestion des Alarmes</field>
+        <field name="res_model">alarm.management</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+
+    <!-- Menus -->
+    <menuitem id="menu_alarm_management" name="Gestion des Alarmes" parent="menu_pv_root" action="action_alarm_management"/>
+</odoo>

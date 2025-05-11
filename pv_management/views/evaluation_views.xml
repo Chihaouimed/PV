@@ -1,0 +1,132 @@
+<odoo>
+    <!-- Form View -->
+    <record id="view_pv_evaluation_form" model="ir.ui.view">
+        <field name="name">pv.evaluation.form</field>
+        <field name="model">pv.evaluation</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_view_installation" string="View Installation" type="object" class="oe_highlight" icon="fa-building"/>
+                    <button name="action_view_intervention" string="View Intervention" type="object"
+                            class="oe_highlight" icon="fa-wrench"
+                            attrs="{'invisible': [('intervention_id', '=', False)]}"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,in_progress,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="client_id" options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="installation_id" options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="date_evaluation"/>
+                        </group>
+                        <group>
+                            <field name="intervention_id" options="{'no_create': True}"/>
+                            <field name="technicien_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Installation Evaluation">
+                            <group>
+                                <group string="Performance Metrics">
+                                    <field name="performance_ratio"/>
+                                    <field name="energy_produced"/>
+                                    <field name="system_efficiency"/>
+                                </group>
+                                <group string="Condition Assessment">
+                                    <field name="panel_condition"/>
+                                    <field name="inverter_condition"/>
+                                </group>
+                            </group>
+                            <group string="Issues and Recommendations">
+                                <field name="issues_found" placeholder="Describe any issues found during evaluation..."/>
+                                <field name="recommendations" placeholder="Provide recommendations based on the evaluation..."/>
+                            </group>
+                        </page>
+                        <page string="Technician Evaluation" attrs="{'invisible': [('technicien_id', '=', False)]}">
+                            <group>
+                                <group string="Rating">
+                                    <field name="technician_rating"/>
+                                    <field name="technician_knowledge"/>
+                                    <field name="technician_professionalism"/>
+                                    <field name="technician_communication"/>
+                                </group>
+                                <group string="Feedback">
+                                    <field name="technician_feedback" placeholder="Additional comments about technician performance..."/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_pv_evaluation_tree" model="ir.ui.view">
+        <field name="name">pv.evaluation.tree</field>
+        <field name="model">pv.evaluation</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="client_id"/>
+                <field name="installation_id"/>
+                <field name="date_evaluation"/>
+                <field name="intervention_id"/>
+                <field name="technicien_id"/>
+                <field name="performance_ratio"/>
+                <field name="technician_rating"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_pv_evaluation_search" model="ir.ui.view">
+        <field name="name">pv.evaluation.search</field>
+        <field name="model">pv.evaluation</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="client_id"/>
+                <field name="installation_id"/>
+                <field name="technicien_id"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter name="group_by_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_by_client" string="Client" context="{'group_by': 'client_id'}"/>
+                    <filter name="group_by_installation" string="Installation" context="{'group_by': 'installation_id'}"/>
+                    <filter name="group_by_technician" string="Technician" context="{'group_by': 'technicien_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_pv_evaluation" model="ir.actions.act_window">
+        <field name="name">Evaluations</field>
+        <field name="res_model">pv.evaluation</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_pv_evaluation_search"/>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_pv_evaluation" name="Evaluations" parent="menu_pv_root" action="action_pv_evaluation" sequence="50"/>
+
+    <!-- Sequence for automatic numbering -->
+    <record id="sequence_pv_evaluation" model="ir.sequence">
+        <field name="name">PV Evaluation Sequence</field>
+        <field name="code">pv.evaluation.sequence</field>
+        <field name="prefix">EVAL/</field>
+        <field name="padding">5</field>
+    </record>
+</odoo>

@@ -1,0 +1,10 @@
+<odoo>
+    <!-- Configuration Menu -->
+    <menuitem id="menu_configuration_root" name="Configuration" parent="menu_pv_root"/>
+
+    <menuitem id="menu_pv_module" name="Modules" parent="menu_configuration_root" action="action_pv_module"/>
+    <menuitem id="menu_pv_inverter" name="Onduleurs" parent="menu_configuration_root" action="action_pv_inverter"/>
+    <menuitem id="menu_marque_onduleur" name="Marques d'Onduleur" parent="menu_configuration_root" action="action_marque_onduleur"/>
+    <menuitem id="menu_alarm_management" name="Gestion des Alarmes" parent="menu_configuration_root" action="action_alarm_management"/>
+    <menuitem id="menu_configuration_district_steg" name="Districts STEG" parent="menu_configuration_root" action="action_configuration_district_steg"/>
+</odoo>

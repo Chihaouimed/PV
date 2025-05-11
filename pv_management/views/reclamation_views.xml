@@ -1,0 +1,137 @@
+<odoo>
+    <!-- Form View -->
+    <record id="view_reclamation_form" model="ir.ui.view">
+        <field name="name">reclamation.form</field>
+        <field name="model">reclamation</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_create_intervention" string="Création fiche d'intervention"
+                            type="object" class="oe_highlight" icon="fa-wrench"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_interventions" type="object" class="oe_stat_button" icon="fa-wrench">
+                            <field name="intervention_count" widget="statinfo" string="Interventions"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date_heure"/>
+                            <field name="client_id" options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="nom_central_id" options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="adresse"/>
+                        </group>
+                        <group>
+                            <field name="date_disponibilite"/>
+                            <field name="code_alarm_id"/>
+                            <field name="priorite_urgence"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <field name="description" placeholder="Détails de la réclamation..."/>
+                        </page>
+                        <page string="Cause de l'alarme">
+                            <field name="cause_alarme" placeholder="Explication de la cause de l'alarme..."/>
+                        </page>
+                        <page string="Fiches d'intervention" attrs="{'invisible': [('intervention_ids', '=', [])]}">
+                            <field name="intervention_ids" readonly="1">
+                                <tree>
+                                    <field name="name"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_reclamation_tree" model="ir.ui.view">
+        <field name="name">reclamation.tree</field>
+        <field name="model">reclamation</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="date_heure"/>
+                <field name="nom_central_id"/>
+                <field name="client_id"/>
+                <field name="code_alarm_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_reclamation_search" model="ir.ui.view">
+        <field name="name">reclamation.search</field>
+        <field name="model">reclamation</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="nom_central_id"/>
+                <field name="client_id"/>
+                <field name="code_alarm_id"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter name="group_by_central" string="Central" context="{'group_by': 'nom_central_id'}"/>
+                    <filter name="group_by_client" string="Client" context="{'group_by': 'client_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_reclamation" model="ir.actions.act_window">
+        <field name="name">Réclamations</field>
+        <field name="res_model">reclamation</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_reclamation_search"/>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_reclamation" name="Réclamations" parent="menu_pv_root" action="action_reclamation"/>
+
+    <!-- Sequence pour la numérotation automatique -->
+    <record id="sequence_reclamation" model="ir.sequence">
+        <field name="name">Séquence de réclamation</field>
+        <field name="code">reclamation.sequence</field>
+        <field name="prefix">REC/</field>
+        <field name="padding">5</field>
+    </record>
+
+    <!-- Template d'email pour la notification -->
+    <record id="email_template_reclamation_closed" model="mail.template">
+        <field name="name">Notification de fermeture de réclamation</field>
+        <field name="model_id" ref="model_reclamation"/>
+        <field name="subject">Réclamation ${object.name} fermée</field>
+        <field name="email_from">${object.company_id.email|safe}</field>
+        <field name="email_to">${object.contrat_id.email|safe}</field>
+        <field name="body_html"><![CDATA[
+            <div style="font-family: 'Lucida Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; ">
+                <p>Bonjour ${object.contrat_id.name},</p>
+                <p>Nous vous informons que votre réclamation <strong>${object.name}</strong> concernant l'installation "${object.nom_central_id.name}" a été fermée.</p>
+                <p>Détails de la réclamation :</p>
+                <ul>
+                    <li>Date: ${object.date_heure}</li>
+                    <li>Adresse: ${object.adresse}</li>
+                    <li>Description: ${object.description}</li>
+                </ul>
+                <p>Si vous avez des questions supplémentaires, n'hésitez pas à nous contacter.</p>
+                <p>Cordialement,</p>
+                <p>L'équipe de service</p>
+            </div>
+        ]]></field>
+    </record>
+</odoo>

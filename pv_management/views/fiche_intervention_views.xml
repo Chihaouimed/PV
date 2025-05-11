@@ -1,0 +1,129 @@
+<odoo>
+    <!-- Form View -->
+    <record id="view_fiche_intervention_form" model="ir.ui.view">
+        <field name="name">fiche.intervention.form</field>
+        <field name="model">fiche.intervention</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                     <button name="action_view_reclamation" string="Voir la réclamation" type="object" class="oe_highlight" icon="fa-arrow-left"/>
+                     <button name="action_draft" string="Ouvrir" states="in_progress" type="object" class="oe_highlight" attrs="{'invisible': [('state', '=', 'closed')]}"/>
+                    <button name="action_in_progress" string="En cours" states="draft" type="object" class="oe_highlight" attrs="{'invisible': [('state', '=', 'closed')]}"/>
+                    <button name="action_closed" string="Fermer" states="draft,in_progress" type="object" class="oe_highlight"/>
+                    <button name="action_create_reponse" string="Créer une fiche de réponse" type="object" class="oe_highlight" icon="fa-file-text-o" attrs="{'invisible': [('state', '!=', 'closed')]}"/>
+                    <button name="action_create_evaluation" string="Create Evaluation" type="object" class="oe_highlight" icon="fa-star" attrs="{'invisible': [('state', '!=', 'closed')]}"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,in_progress,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_reponses" type="object" class="oe_stat_button" icon="fa-file-text-o" attrs="{'invisible': [('reponse_count', '=', 0)]}">
+                            <field name="reponse_count" widget="statinfo" string="Réponses"/>
+                        </button>
+                        <button name="action_view_evaluations" type="object" class="oe_stat_button" icon="fa-star"
+                                attrs="{'invisible': [('evaluation_count', '=', 0)]}">
+                            <field name="evaluation_count" widget="statinfo" string="Evaluations"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="type_intervention" attrs="{'readonly': [('state', '=', 'closed')]}"/>
+                            <field name="installation_id"/>
+                            <field name="adresse"/>
+                            <field name="reclamation_id"/>
+                        </group>
+                        <group>
+                            <field name="technicien_id" attrs="{'readonly': [('state', '=', 'closed')]}"/>
+                            <field name="equipe_intervention_ids" widget="many2many_tags" attrs="{'readonly': [('state', '=', 'closed')]}"/>
+                            <field name="code_alarm_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Agenda">
+                            <field name="agenda_line_ids" attrs="{'readonly': [('state', '=', 'closed')]}">
+                                <tree editable="bottom">
+                                     <field name="date_intervention"/>
+                                     <field name="description"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Fiches de Réponse" attrs="{'invisible': [('reponse_ids', '=', [])]}">
+                            <field name="reponse_ids" readonly="1">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="montant_a_payer"/>
+                                    <field name="est_paye"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_fiche_intervention_tree" model="ir.ui.view">
+        <field name="name">fiche.intervention.tree</field>
+        <field name="model">fiche.intervention</field>
+        <field name="arch" type="xml">
+            <tree decoration-info="state == 'draft'" decoration-warning="state == 'in_progress'" decoration-success="state == 'closed'">
+                <field name="name"/>
+                <field name="type_intervention"/>
+                <field name="installation_id"/>
+                <field name="technicien_id"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_fiche_intervention_search" model="ir.ui.view">
+        <field name="name">fiche.intervention.search</field>
+        <field name="model">fiche.intervention</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="type_intervention"/>
+                <field name="technicien_id"/>
+                <field name="installation_id"/>
+                <separator/>
+                <filter string="Ouvert" name="state_draft" domain="[('state','=','draft')]"/>
+                <filter string="En cours" name="state_progress" domain="[('state','=','in_progress')]"/>
+                <filter string="Fermé" name="state_closed" domain="[('state','=','closed')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_by_state" string="État" context="{'group_by': 'state'}"/>
+                    <filter name="group_by_type" string="Type" context="{'group_by': 'type_intervention'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_fiche_intervention" model="ir.actions.act_window">
+        <field name="name">Fiches des interventions</field>
+        <field name="res_model">fiche.intervention</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fiche_intervention_search"/>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_fiche_intervention" name="Fiches d'intervention" parent="menu_pv_root" action="action_fiche_intervention"/>
+
+    <!-- Sequence pour la numérotation automatique -->
+    <record id="sequence_fiche_intervention" model="ir.sequence">
+        <field name="name">Séquence de fiche d'intervention</field>
+        <field name="code">fiche.intervention.sequence</field>
+        <field name="prefix">INT/</field>
+        <field name="padding">5</field>
+    </record>
+</odoo>

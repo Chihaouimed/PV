@@ -1,0 +1,54 @@
+<odoo>
+    <!-- Form View -->
+    <record id="view_configuration_district_steg_form" model="ir.ui.view">
+        <field name="name">configuration.district.steg.form</field>
+        <field name="model">configuration.district.steg</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="marque_onduleur"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_configuration_district_steg_tree" model="ir.ui.view">
+        <field name="name">configuration.district.steg.tree</field>
+        <field name="model">configuration.district.steg</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="marque_onduleur"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_configuration_district_steg_search" model="ir.ui.view">
+        <field name="name">configuration.district.steg.search</field>
+        <field name="model">configuration.district.steg</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_configuration_district_steg" model="ir.actions.act_window">
+        <field name="name">Districts STEG</field>
+        <field name="res_model">configuration.district.steg</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_configuration_district_steg_search"/>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_configuration_district_steg" 
+              name="Districts STEG" 
+              parent="menu_pv_root" 
+              action="action_configuration_district_steg"/>
+</odoo>
