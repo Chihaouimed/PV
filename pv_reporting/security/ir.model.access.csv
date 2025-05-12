@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_pv_installation_report,pv.installation.report,model_pv_installation_report,,1,0,0,0
+access_pv_reclamation_report,pv.reclamation.report,model_pv_reclamation_report,,1,0,0,0
+access_pv_intervention_report,pv.intervention.report,model_pv_intervention_report,,1,0,0,0
+access_pv_dashboard,pv.dashboard,model_pv_dashboard,,1,1,1,1

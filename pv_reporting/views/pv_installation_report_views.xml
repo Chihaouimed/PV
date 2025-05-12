@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Installation Report Pivot View -->
+    <record id="view_pv_installation_report_pivot" model="ir.ui.view">
+        <field name="name">pv.installation.report.pivot</field>
+        <field name="model">pv.installation.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Analyse des Installations PV" display_quantity="true">
+                <field name="type_installation" type="row"/>
+                <field name="year" type="col"/>
+                <field name="puissance_souscrite" type="measure"/>
+                <field name="consommation_annuelle" type="measure"/>
+                <field name="nb_modules" type="measure"/>
+                <field name="nb_onduleurs" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Installation Report Graph View -->
+    <record id="view_pv_installation_report_graph" model="ir.ui.view">
+        <field name="name">pv.installation.report.graph</field>
+        <field name="model">pv.installation.report</field>
+        <field name="arch" type="xml">
+            <graph string="Analyse des Installations PV" type="bar" stacked="True">
+                <field name="type_installation"/>
+                <field name="puissance_souscrite" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Installation Report Tree View -->
+    <record id="view_pv_installation_report_tree" model="ir.ui.view">
+        <field name="name">pv.installation.report.tree</field>
+        <field name="model">pv.installation.report</field>
+        <field name="arch" type="xml">
+            <tree string="Installations PV">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="client_name"/>
+                <field name="date_mise_en_service"/>
+                <field name="type_installation"/>
+                <field name="district_steg_id"/>
+                <field name="puissance_souscrite"/>
+                <field name="consommation_annuelle"/>
+                <field name="nb_modules"/>
+                <field name="nb_onduleurs"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Installation Report Search View -->
+    <record id="view_pv_installation_report_search" model="ir.ui.view">
+        <field name="name">pv.installation.report.search</field>
+        <field name="model">pv.installation.report</field>
+        <field name="arch" type="xml">
+            <search string="Recherche Installations">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="client_name"/>
+                <field name="type_installation"/>
+                <field name="district_steg_id"/>
+                <separator/>
+                <filter string="Cette Année" name="filter_this_year" domain="[('year', '=', time.strftime('%Y'))]"/>
+                <filter string="Résidentielles" name="filter_bt_residentiel" domain="[('type_installation', '=', 'bt_residentiel')]"/>
+                <filter string="Commerciales" name="filter_bt_commercial" domain="[('type_installation', '=', 'bt_commercial')]"/>
+                <filter string="Industrielles" name="filter_mt_industriel" domain="[('type_installation', '=', 'mt_industriel')]"/>
+                <separator/>
+                <filter string="En Cours" name="filter_in_progress" domain="[('state', '=', 'in_progress')]"/>
+                <filter string="Terminées" name="filter_in_stop" domain="[('state', '=', 'in_stop')]"/>
+                <group expand="0" string="Regrouper Par">
+                    <filter string="Type d'Installation" name="group_by_type" context="{'group_by':'type_installation'}"/>
+                    <filter string="État" name="group_by_state" context="{'group_by':'state'}"/>
+                    <filter string="Client" name="group_by_client" context="{'group_by':'client_id'}"/>
+                    <filter string="District STEG" name="group_by_district" context="{'group_by':'district_steg_id'}"/>
+                    <filter string="Année" name="group_by_year" context="{'group_by':'year'}"/>
+                    <filter string="Trimestre" name="group_by_quarter" context="{'group_by':'quarter'}"/>
+                    <filter string="Mois" name="group_by_month" context="{'group_by':'month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action for Installation Report -->
+    <record id="action_pv_installation_report" model="ir.actions.act_window">
+        <field name="name">Analyse des Installations</field>
+        <field name="res_model">pv.installation.report</field>
+        <field name="view_mode">pivot,graph,tree</field>
+        <field name="search_view_id" ref="view_pv_installation_report_search"/>
+        <field name="context">{'search_default_group_by_type': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Aucune donnée d'installation à analyser
+            </p>
+            <p>
+                Créez de nouvelles installations pour voir des analyses ici.
+            </p>
+        </field>
+    </record>
+</odoo>

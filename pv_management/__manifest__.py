@@ -5,7 +5,7 @@
     'description': 'Module to manage PV installations, modules, and inverters',
     'author': 'Chihaoui Mohamed',
     'category': 'Technical',
-    'depends':  ['base', 'mail', 'hr'],
+    'depends': ['base', 'mail', 'hr'],
     'data': [
         'security/ir.model.access.csv',
         'views/pv_installation_views.xml',

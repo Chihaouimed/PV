@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Intervention Report Pivot View -->
+    <record id="view_pv_intervention_report_pivot" model="ir.ui.view">
+        <field name="name">pv.intervention.report.pivot</field>
+        <field name="model">pv.intervention.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Analyse des Interventions" display_quantity="true">
+                <field name="type_intervention" type="row"/>
+                <field name="technicien_name" type="row"/>
+                <field name="month" type="col"/>
+                <field name="nombre_interventions" type="measure"/>
+                <field name="duree_intervention_jours" type="measure"/>
+                <field name="montant_total" type="measure"/>
+                <field name="montant_paye" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Intervention Report Graph View -->
+    <record id="view_pv_intervention_report_graph" model="ir.ui.view">
+        <field name="name">pv.intervention.report.graph</field>
+        <field name="model">pv.intervention.report</field>
+        <field name="arch" type="xml">
+            <graph string="Interventions par type" type="bar" stacked="True">
+                <field name="type_intervention"/>
+                <field name="nombre_interventions" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Intervention Report Tree View -->
+    <record id="view_pv_intervention_report_tree" model="ir.ui.view">
+        <field name="name">pv.intervention.report.tree</field>
+        <field name="model">pv.intervention.report</field>
+        <field name="arch" type="xml">
+            <tree string="Interventions">
+                <field name="name"/>
+                <field name="create_date"/>
+                <field name="type_intervention"/>
+                <field name="technicien_name"/>
+                <field name="installation_name"/>
+                <field name="client_name"/>
+                <field name="state"/>
+                <field name="duree_intervention_jours"/>
+                <field name="montant_total"/>
+                <field name="montant_paye"/>
+                <field name="est_payee"/>
+                <field name="note_technicien"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Intervention Report Search View -->
+    <record id="view_pv_intervention_report_search" model="ir.ui.view">
+        <field name="name">pv.intervention.report.search</field>
+        <field name="model">pv.intervention.report</field>
+        <field name="arch" type="xml">
+            <search string="Recherche Interventions">
+                <field name="name"/>
+                <field name="type_intervention"/>
+                <field name="technicien_name"/>
+                <field name="installation_name"/>
+                <field name="client_name"/>
+                <separator/>
+                <filter string="Maintenance" name="filter_maintenance" domain="[('type_intervention', '=', 'maintenance')]"/>
+                <filter string="Installation" name="filter_installation" domain="[('type_intervention', '=', 'installation')]"/>
+                <filter string="Réparation" name="filter_reparation" domain="[('type_intervention', '=', 'reparation')]"/>
+                <filter string="Inspection" name="filter_inspection" domain="[('type_intervention', '=', 'inspection')]"/>
+                <separator/>
+                <filter string="Ouvert" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="En cours" name="filter_in_progress" domain="[('state', '=', 'in_progress')]"/>
+                <filter string="Fermé" name="filter_closed" domain="[('state', '=', 'closed')]"/>
+                <separator/>
+                <filter string="Payée" name="filter_est_payee" domain="[('est_payee', '=', True)]"/>
+                <filter string="Non Payée" name="filter_non_payee" domain="[('est_payee', '=', False)]"/>
+                <separator/>
+                <filter string="Cette Année" name="filter_this_year" domain="[('year', '=', time.strftime('%Y'))]"/>
+                <filter string="Ce Mois" name="filter_this_month" domain="[('year', '=', time.strftime('%Y')), ('month', '=', time.strftime('%m'))]"/>
+                <group expand="0" string="Regrouper Par">
+                    <filter string="Type d'Intervention" name="group_by_type" context="{'group_by':'type_intervention'}"/>
+                    <filter string="État" name="group_by_state" context="{'group_by':'state'}"/>
+                    <filter string="Technicien" name="group_by_technicien" context="{'group_by':'technicien_id'}"/>
+                    <filter string="Client" name="group_by_client" context="{'group_by':'client_id'}"/>
+                    <filter string="Installation" name="group_by_installation" context="{'group_by':'installation_id'}"/>
+                    <filter string="Année" name="group_by_year" context="{'group_by':'year'}"/>
+                    <filter string="Trimestre" name="group_by_quarter" context="{'group_by':'quarter'}"/>
+                    <filter string="Mois" name="group_by_month" context="{'group_by':'month'}"/>
+                    <filter string="Semaine" name="group_by_week" context="{'group_by':'week'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action for Intervention Report -->
+    <record id="action_pv_intervention_report" model="ir.actions.act_window">
+        <field name="name">Analyse des Interventions</field>
+        <field name="res_model">pv.intervention.report</field>
+        <field name="view_mode">pivot,graph,tree</field>
+        <field name="search_view_id" ref="view_pv_intervention_report_search"/>
+        <field name="context">{'search_default_group_by_type': 1, 'search_default_filter_this_year': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Aucune donnée d'intervention à analyser
+            </p>
+            <p>
+                Les interventions créées apparaîtront ici pour analyse.
+            </p>
+        </field>
+    </record>
+</odoo>

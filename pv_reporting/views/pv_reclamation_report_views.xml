@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Reclamation Report Pivot View -->
+    <record id="view_pv_reclamation_report_pivot" model="ir.ui.view">
+        <field name="name">pv.reclamation.report.pivot</field>
+        <field name="model">pv.reclamation.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Analyse des Réclamations" display_quantity="true">
+                <field name="priorite_urgence" type="row"/>
+                <field name="code_alarm_name" type="row"/>
+                <field name="month" type="col"/>
+
+                <field name="delai_intervention_heures" type="measure"/>
+                <field name="nb_interventions" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Reclamation Report Graph View -->
+    <record id="view_pv_reclamation_report_graph" model="ir.ui.view">
+        <field name="name">pv.reclamation.report.graph</field>
+        <field name="model">pv.reclamation.report</field>
+        <field name="arch" type="xml">
+            <graph string="Réclamations par mois" type="line">
+                <field name="month"/></graph>
+        </field>
+    </record>
+
+    <!-- Reclamation Report Tree View -->
+    <record id="view_pv_reclamation_report_tree" model="ir.ui.view">
+        <field name="name">pv.reclamation.report.tree</field>
+        <field name="model">pv.reclamation.report</field>
+        <field name="arch" type="xml">
+            <tree string="Réclamations">
+                <field name="name"/>
+                <field name="date_heure"/>
+                <field name="client_id"/>
+                <field name="installation_name"/>
+                <field name="code_alarm_name"/>
+                <field name="priorite_urgence"/>
+                <field name="delai_intervention_heures"/>
+                <field name="nb_interventions"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Reclamation Report Search View -->
+    <record id="view_pv_reclamation_report_search" model="ir.ui.view">
+        <field name="name">pv.reclamation.report.search</field>
+        <field name="model">pv.reclamation.report</field>
+        <field name="arch" type="xml">
+            <search string="Recherche Réclamations">
+                <field name="name"/>
+                <field name="client_id"/>
+                <field name="installation_name"/>
+                <field name="code_alarm_name"/>
+                <separator/>
+                <filter string="Haute Priorité" name="filter_haute" domain="[('priorite_urgence', '=', 'haute')]"/>
+                <filter string="Priorité Moyenne" name="filter_moyenne" domain="[('priorite_urgence', '=', 'moyenne')]"/>
+                <filter string="Priorité Basse" name="filter_basse" domain="[('priorite_urgence', '=', 'basse')]"/>
+                <separator/>
+                <filter string="Cette Année" name="filter_this_year" domain="[('year', '=', time.strftime('%Y'))]"/>
+                <filter string="Ce Mois" name="filter_this_month" domain="[('year', '=', time.strftime('%Y')), ('month', '=', time.strftime('%m'))]"/>
+                <group expand="0" string="Regrouper Par">
+                    <filter string="Priorité" name="group_by_priorite" context="{'group_by':'priorite_urgence'}"/>
+                    <filter string="Code Alarme" name="group_by_code_alarm" context="{'group_by':'code_alarm_id'}"/>
+                    <filter string="Client" name="group_by_client" context="{'group_by':'client_id'}"/>
+                    <filter string="Installation" name="group_by_installation" context="{'group_by':'installation_id'}"/>
+                    <filter string="Année" name="group_by_year" context="{'group_by':'year'}"/>
+                    <filter string="Trimestre" name="group_by_quarter" context="{'group_by':'quarter'}"/>
+                    <filter string="Mois" name="group_by_month" context="{'group_by':'month'}"/>
+                    <filter string="Semaine" name="group_by_week" context="{'group_by':'week'}"/>
+                    <filter string="Jour" name="group_by_day" context="{'group_by':'day'}"/>
+                    <filter string="Heure" name="group_by_hour" context="{'group_by':'hour'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action for Reclamation Report -->
+    <record id="action_pv_reclamation_report" model="ir.actions.act_window">
+        <field name="name">Analyse des Réclamations</field>
+        <field name="res_model">pv.reclamation.report</field>
+        <field name="view_mode">pivot,graph,tree</field>
+        <field name="search_view_id" ref="view_pv_reclamation_report_search"/>
+        <field name="context">{'search_default_group_by_priorite': 1, 'search_default_filter_this_year': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Aucune donnée de réclamation à analyser
+            </p>
+            <p>
+                Les réclamations créées apparaîtront ici pour analyse.
+            </p>
+        </field>
+    </record>
+</odoo>

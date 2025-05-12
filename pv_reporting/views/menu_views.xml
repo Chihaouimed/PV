@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Main Menu -->
+    <menuitem id="menu_pv_reporting_root" name="PV Reporting" sequence="20"/>
+
+    <!-- Dashboard Menu - Utilise l'action dashboard standard au lieu de action_pv_dashboard_main -->
+    <menuitem id="menu_pv_dashboard" name="Tableau de Bord"
+              parent="menu_pv_reporting_root"
+              action="action_pv_dashboard"
+              sequence="80"/>
+
+    <!-- Reporting Menus -->
+    <menuitem id="menu_pv_reporting" name="Analyses" parent="menu_pv_reporting_root" sequence="20"/>
+
+    <menuitem id="menu_pv_installation_report" name="Installations"
+              parent="menu_pv_reporting"
+              action="action_pv_installation_report"
+              sequence="10"/>
+
+    <menuitem id="menu_pv_reclamation_report" name="Réclamations"
+              parent="menu_pv_reporting"
+              action="action_pv_reclamation_report"
+              sequence="20"/>
+
+    <menuitem id="menu_pv_intervention_report" name="Interventions"
+              parent="menu_pv_reporting"
+              action="action_pv_intervention_report"
+              sequence="30"/>
+
+    <!-- Configuration Menu -->
+    <menuitem id="menu_pv_reporting_config" name="Configuration" parent="menu_pv_reporting_root" sequence="100"/>
+
+    <menuitem id="menu_pv_dashboard_config" name="Tableaux de Bord"
+              parent="menu_pv_reporting_config"
+              action="action_pv_dashboard"
+              sequence="10"/>
+</odoo>

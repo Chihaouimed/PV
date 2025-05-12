@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Dashboard Form View -->
+    <record id="view_pv_dashboard_form" model="ir.ui.view">
+        <field name="name">pv.dashboard.form</field>
+        <field name="model">pv.dashboard</field>
+        <field name="arch" type="xml">
+            <form string="Tableau de bord PV">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Nom du tableau de bord"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date_from"/>
+                        </group>
+                        <group>
+                            <field name="date_to"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="KPIs">
+                            <group>
+                                <group string="Installations">
+                                    <field name="nb_installations"/>
+                                    <field name="nb_installations_actives"/>
+                                </group>
+                                <group string="Réclamations &amp; Interventions">
+                                    <field name="nb_reclamations"/>
+                                    <field name="nb_interventions"/>
+                                    <field name="taux_resolution" widget="percentage"/>
+                                    <field name="delai_moyen_intervention"/>
+                                </group>
+                                <group string="Finances">
+                                    <field name="montant_total_facture" widget="monetary"/>
+                                    <field name="montant_total_paye" widget="monetary"/>
+                                    <field name="taux_paiement" widget="percentage"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Graphiques">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <button name="%(action_pv_installation_report)d" string="Analyse des Installations" type="action" class="oe_stat_button" icon="fa-bar-chart"/>
+                                </div>
+                                <div class="col-md-6">
+                                    <button name="%(action_pv_reclamation_report)d" string="Analyse des Réclamations" type="action" class="oe_stat_button" icon="fa-line-chart"/>
+                                </div>
+                            </div>
+                            <div class="row mt16">
+                                <div class="col-md-6">
+                                    <button name="%(action_pv_intervention_report)d" string="Analyse des Interventions" type="action" class="oe_stat_button" icon="fa-pie-chart"/>
+                                </div>
+                            </div>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Dashboard Tree View -->
+    <record id="view_pv_dashboard_tree" model="ir.ui.view">
+        <field name="name">pv.dashboard.tree</field>
+        <field name="model">pv.dashboard</field>
+        <field name="arch" type="xml">
+            <tree string="Tableaux de bord">
+                <field name="name"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="nb_installations"/>
+                <field name="nb_reclamations"/>
+                <field name="nb_interventions"/>
+                <field name="taux_resolution"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Action for Dashboard -->
+    <record id="action_pv_dashboard" model="ir.actions.act_window">
+        <field name="name">Tableau de bord</field>
+        <field name="res_model">pv.dashboard</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créez votre premier tableau de bord
+            </p>
+            <p>
+                Les tableaux de bord vous permettent de suivre les KPIs et performances de vos activités PV.
+            </p>
+        </field>
+    </record>
+</odoo>
