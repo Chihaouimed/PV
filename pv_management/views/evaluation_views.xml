@@ -47,7 +47,7 @@
                                 <field name="recommendations" placeholder="Provide recommendations based on the evaluation..."/>
                             </group>
                         </page>
-                        <page string="Technician Evaluation" attrs="{'invisible': [('technicien_id', '=', False)]}">
+                        <page string="Technician Evaluation" attrs="{'invisible': [('technicien_id', '=', True)]}">
                             <group>
                                 <group string="Rating">
                                     <field name="technician_rating"/>

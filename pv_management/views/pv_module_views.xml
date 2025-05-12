@@ -36,12 +36,13 @@
         <field name="res_model">pv.module</field>
         <field name="view_mode">tree,form</field>
     </record>
-    <record id="sequence_pv_module" model="ir.sequence">
-    <field name="name">PV Module Reference Sequence</field>
-    <field name="code">pv.module.sequence</field>
-    <field name="prefix">MOD/</field>
-    <field name="padding">5</field>
-</record>
+    <record id="sequence_pv_module_new" model="ir.sequence">
+        <field name="name">PV Module Reference Sequence</field>
+        <field name="code">pv.module.sequence</field>
+        <field name="prefix">MOD/</field>
+        <field name="padding">5</field>
+        <field name="number_increment">1</field>
+    </record>
 
     <menuitem id="menu_pv_module" name="Modules" parent="menu_pv_root" action="action_pv_module"/>
 </odoo>
