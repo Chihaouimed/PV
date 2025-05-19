@@ -31,9 +31,9 @@ class PVInstallation(models.Model):
         ('triphase', 'Triphasé')
     ], string='Type de Compteur')
 
-    calibre_disjoncteur_existant_id = fields.Many2one('configuration.district.steg',
+    calibre_disjoncteur_existant_id = fields.Many2one('calibre.disj',
                                                       string='Calibre Disjoncteur Existant (A)')
-    calibre_disjoncteur_steg_id = fields.Many2one('configuration.district.steg', string='Calibre Disjoncteur STEG (A)')
+    calibre_disjoncteur_steg_id = fields.Many2one('calibre.disj', string='Calibre Disjoncteur STEG (A)')
     puissance_souscrite = fields.Float(string='Puissance Souscrite')
     consommation_annuelle = fields.Integer(string='Consommation Annuelle')
     # State Field

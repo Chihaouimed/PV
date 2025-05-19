@@ -18,8 +18,8 @@
         'views/configuration_steg_views.xml',
         'views/evaluation_views.xml',
         'views/fiche_reponse_views.xml',
+        'views/calibre_disj_views.xml',
         'views/configuration_menu.xml',
-
     ],
     'installable': True,
     'application': True,

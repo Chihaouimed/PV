@@ -1,0 +1,39 @@
+<odoo>
+    <!-- Form View -->
+    <record id="view_calibre_disj_form" model="ir.ui.view">
+        <field name="name">calibre.disj.form</field>
+        <field name="model">calibre.disj</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="code"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_calibre_disj_tree" model="ir.ui.view">
+        <field name="name">calibre.disj.tree</field>
+        <field name="model">calibre.disj</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="code"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_calibre_disj" model="ir.actions.act_window">
+        <field name="name">Calibre Disjoncteur</field>
+        <field name="res_model">calibre.disj</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_calibre_disj" name="Calibre Disjoncteur" parent="menu_pv_root" action="action_calibre_disj"/>
+</odoo>

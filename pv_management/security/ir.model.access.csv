@@ -10,3 +10,4 @@ access_fiche_intervention,fiche.intervention,model_fiche_intervention,,1,1,1,1
 access_agenda_intervention_line,agenda.intervention.line,model_agenda_intervention_line,,1,1,1,1
 access_pv_evaluation,pv.evaluation,model_pv_evaluation,,1,1,1,1
 access_fiche_reponse,fiche.reponse,model_fiche_reponse,,1,1,1,1
+access_calibre_disj,calibre.disj,model_calibre_disj,,1,1,1,1

@@ -3,7 +3,7 @@ from odoo import models, fields, api
 class AlarmManagement(models.Model):
     _name = 'alarm.management'
     _description = 'Alarm Management'
-    
+
     name = fields.Char(string='Name', required=True, translate=True)
     partie = fields.Selection([
         ('onduleur', 'Onduleur'),

@@ -42,10 +42,10 @@
                                     <field name="inverter_condition"/>
                                 </group>
                             </group>
-                            <group string="Issues and Recommendations">
+                            <!--<group string="Issues and Recommendations">
                                 <field name="issues_found" placeholder="Describe any issues found during evaluation..."/>
                                 <field name="recommendations" placeholder="Provide recommendations based on the evaluation..."/>
-                            </group>
+                            </group>-->
                         </page>
                         <page string="Technician Evaluation" attrs="{'invisible': [('technicien_id', '=', True)]}">
                             <group>
