@@ -25,6 +25,9 @@
         'views/menu_views.xml',
 
     ],
+    'external_dependencies': {
+        'python': ['requests', 'json'],
+    },
 
     'qweb': [],
     'application': True,

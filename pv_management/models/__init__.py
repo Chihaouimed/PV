@@ -7,3 +7,4 @@ from . import reclamation
 from . import fiche_intervention
 from . import evaluation
 from . import fiche_reponse
+from . import pv_openai_service

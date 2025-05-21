@@ -1,4 +1,4 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 
 
@@ -29,6 +29,36 @@ class Reclamation(models.Model):
     # Champ pour lier à fiche.intervention (si ce modèle existe ou sera créé)
     intervention_ids = fields.One2many('fiche.intervention', 'reclamation_id', string='Fiches d\'intervention')
     intervention_count = fields.Integer(compute='_compute_intervention_count', string='Nombre d\'interventions')
+
+    def action_view_alarm_action_plan(self):
+        """
+        Affiche le plan d'action associé au code d'alarme de la réclamation
+        """
+        self.ensure_one()
+        if not self.code_alarm_id:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Attention'),
+                    'message': _('Aucun code d\'alarme associé à cette réclamation'),
+                    'sticky': False,
+                    'type': 'warning'
+                }
+            }
+
+        # Si le code d'alarme n'a pas encore de plan d'action, le générer automatiquement
+        if not self.code_alarm_id.action_plan_html:
+            self.code_alarm_id.action_generate_action_plan()
+
+        return {
+            'name': _('Plan d\'action pour l\'alarme %s') % self.code_alarm_id.name,
+            'type': 'ir.actions.act_window',
+            'res_model': 'alarm.management',
+            'view_mode': 'form',
+            'res_id': self.code_alarm_id.id,
+            'target': 'current',
+        }
 
     @api.onchange('client_id')
     def _onchange_client_id(self):

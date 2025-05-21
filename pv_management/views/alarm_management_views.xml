@@ -5,13 +5,26 @@
         <field name="model">alarm.management</field>
         <field name="arch" type="xml">
             <form>
+                <header>
+                    <button name="action_generate_action_plan" string="Générer Plan d'Action IA"
+                            type="object" class="oe_highlight" icon="fa-lightbulb-o"/>
+                </header>
                 <sheet>
                     <group>
                         <field name="name"/>
                         <field name="partie"/>
                         <field name="marque_onduleur_id" attrs="{'invisible': [('partie', '!=', 'onduleur')], 'required': [('partie', '=', 'onduleur')]}"/>
                         <field name="code_alarm"/>
+                        <field name="action_plan_severity" attrs="{'invisible': [('action_plan_html', '=', False)]}"/>
+                        <field name="action_plan_resolution_time" attrs="{'invisible': [('action_plan_html', '=', False)]}" widget="float_time"/>
+                        <field name="requires_specialist" attrs="{'invisible': [('action_plan_html', '=', False)]}"/>
+                        <field name="last_action_plan_date" attrs="{'invisible': [('action_plan_html', '=', False)]}"/>
                     </group>
+                    <notebook attrs="{'invisible': [('action_plan_html', '=', False)]}">
+                        <page string="Plan d'Action IA">
+                            <field name="action_plan_html" widget="html" nolabel="1"/>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>
@@ -27,6 +40,7 @@
                 <field name="partie"/>
                 <field name="marque_onduleur_id"/>
                 <field name="code_alarm"/>
+                <field name="action_plan_severity"/>
             </tree>
         </field>
     </record>
@@ -39,14 +53,14 @@
             <search>
                 <field name="name"/>
                 <field name="code_alarm"/>
-                 <field name="partie"/>
-    <separator/>
-    <filter string="Onduleur Alarms" name="filter_partie_onduleur" domain="[('partie','=','onduleur')]"/>
-    <filter string="Module Alarms" name="filter_partie_module" domain="[('partie','=','module')]"/>
-    <group expand="0" string="Group By">
-        <filter name="group_by_partie" string="Partie" context="{'group_by': 'partie'}"/>
-        <filter name="group_by_marque" string="Marque" context="{'group_by': 'marque_onduleur_id'}"/>
-    </group>
+                <field name="partie"/>
+                <separator/>
+                <filter string="Onduleur Alarms" name="filter_partie_onduleur" domain="[('partie','=','onduleur')]"/>
+                <filter string="Module Alarms" name="filter_partie_module" domain="[('partie','=','module')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_by_partie" string="Partie" context="{'group_by': 'partie'}"/>
+                    <filter name="group_by_marque" string="Marque" context="{'group_by': 'marque_onduleur_id'}"/>
+                </group>
             </search>
         </field>
     </record>
