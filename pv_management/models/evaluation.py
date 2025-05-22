@@ -24,10 +24,24 @@ class Evaluation(models.Model):
                                     store=True)
 
     # Technical evaluation fields for installation
-    performance_ratio = fields.Float(string='Performance Ratio (%)',
-                                     help='Actual output compared to theoretical output')
-    energy_produced = fields.Float(string='Energy Produced (kWh)')
-    system_efficiency = fields.Float(string='System Efficiency (%)')
+    performance_ratio = fields.Selection([
+        ('excellent', 'Excellent'),
+        ('good', 'Good'),
+        ('average', 'Average'),
+        ('poor', 'Poor')
+    ], string='Performance')
+    energy_produced = fields.Selection([
+        ('excellent', 'Excellent'),
+        ('good', 'Good'),
+        ('average', 'Average'),
+        ('poor', 'Poor')
+    ],string='Energy Produced (kWh)')
+    system_efficiency = fields.Selection([
+        ('excellent', 'Excellent'),
+        ('good', 'Good'),
+        ('average', 'Average'),
+        ('poor', 'Poor')
+    ],string='System Efficiency (%)')
 
     # Maintenance evaluation for installation
     panel_condition = fields.Selection([
@@ -52,11 +66,10 @@ class Evaluation(models.Model):
 
     # Technician evaluation fields
     technician_rating = fields.Selection([
-        ('5', 'Excellent (5)'),
-        ('4', 'Good (4)'),
-        ('3', 'Average (3)'),
-        ('2', 'Below Average (2)'),
-        ('1', 'Poor (1)')
+        ('excellent', 'Excellent'),
+        ('good', 'Good'),
+        ('average', 'Average'),
+        ('poor', 'Poor')
     ], string='Technician Rating', tracking=True)
 
     technician_knowledge = fields.Selection([
