@@ -8,6 +8,8 @@
                 <header>
                     <button name="action_generate_action_plan" string="Générer Plan d'Action IA"
                             type="object" class="oe_highlight" icon="fa-lightbulb-o"/>
+                    <button name="action_debug_openai" string="🔍 Debug OpenAI"
+        type="object" class="btn-warning"/>
                 </header>
                 <sheet>
                     <group>

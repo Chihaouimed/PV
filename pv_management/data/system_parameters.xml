@@ -2,7 +2,18 @@
     <data noupdate="1">
         <record id="openai_api_key_param" model="ir.config_parameter">
             <field name="key">pv_management.openai_api_key</field>
-            <field name="value">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</field>
+            <field name="value">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</field>
+        </record>
+    <!-- Configuration du cache -->
+        <record id="ai_cache_duration_param" model="ir.config_parameter">
+            <field name="key">pv_management.ai_cache_duration</field>
+            <field name="value">3600</field> <!-- 1 heure en secondes -->
+        </record>
+
+        <!-- Niveau de logging -->
+        <record id="ai_debug_mode_param" model="ir.config_parameter">
+            <field name="key">pv_management.ai_debug_mode</field>
+            <field name="value">False</field>
         </record>
     </data>
 </odoo>

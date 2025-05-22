@@ -4,6 +4,9 @@ class AlarmManagement(models.Model):
     _name = 'alarm.management'
     _description = 'Alarm Management'
 
+    confidence_level = fields.Float(string='Niveau de confiance (%)', readonly=True)
+    priority_score = fields.Float(string='Score de priorité (0-10)', readonly=True)
+    environmental_factors = fields.Text(string='Facteurs environnementaux', readonly=True)
     name = fields.Char(string='Name', required=True, translate=True)
     partie = fields.Selection([
         ('onduleur', 'Onduleur'),
@@ -27,6 +30,21 @@ class AlarmManagement(models.Model):
     action_plan_resolution_time = fields.Float(string='Temps estimé (heures)', readonly=True)
     requires_specialist = fields.Boolean(string='Spécialiste requis', readonly=True)
 
+    def action_debug_openai(self):
+        """Méthode de debug pour tester OpenAI"""
+        openai_service = self.env['pv.management.openai.service']
+        result = openai_service.debug_full_process()
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Test OpenAI Debug'),
+                'message': result,
+                'sticky': True,
+                'type': 'info'
+            }
+        }
     @api.onchange('partie')
     def _onchange_partie(self):
         # Clear the marque_onduleur_id when partie is not 'onduleur'
