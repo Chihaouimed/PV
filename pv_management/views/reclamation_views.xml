@@ -11,8 +11,6 @@
                     <button name="action_view_alarm_action_plan" string="Consulter plan d'action alarme"
                 type="object" class="oe_highlight" icon="fa-lightbulb-o"
                 attrs="{'invisible': [('code_alarm_id', '=', False)]}"/>
-                    <button name="action_create_intervention" string="Création fiche d'intervention"
-                            type="object" class="oe_highlight" icon="fa-wrench"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">

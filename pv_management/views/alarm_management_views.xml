@@ -7,7 +7,7 @@
             <form>
                 <header>
                     <button name="action_generate_action_plan" string="Générer Plan d'Action IA"
-                            type="object" class="oe_highlight" icon="fa-lightbulb-o"/>
+                            type="object" class="oe_highlight" icon="fa-lightbulb-o" onclick="this.innerHTML='⏳ Génération...'; this.disabled=true; setTimeout(function(){ location.reload(); }, 3000);"/>
                     <button name="action_debug_openai" string="🔍 Debug OpenAI"
         type="object" class="btn-warning"/>
                 </header>
