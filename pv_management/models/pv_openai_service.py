@@ -615,3 +615,4 @@ class PVOpenAIService(models.AbstractModel):
 
         _logger.info("✅ DEBUG COMPLET ENRICHI RÉUSSI")
         return f"✅ Succès: Plan enrichi généré avec {len(plan.get('action_steps', []))} étapes, confiance {plan.get('confidence_score', 0)}%"
+
