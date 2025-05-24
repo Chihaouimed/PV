@@ -7,16 +7,17 @@ class AlarmManagement(models.Model):
     confidence_level = fields.Float(string='Niveau de confiance (%)', readonly=True)
     priority_score = fields.Float(string='Score de priorité (0-10)', readonly=True)
     environmental_factors = fields.Text(string='Facteurs environnementaux', readonly=True)
-    name = fields.Char(string='Name', required=True, translate=True)
+    name = fields.Char(string='Name',  translate=True)
     partie = fields.Selection([
         ('onduleur', 'Onduleur'),
         ('module', 'Module'),
         ('installation', 'Installation'),
         ('batterie', 'Batterie'),
         ('autre', 'Autre')
-    ], string='Partie', required=True, translate=True)
+    ], string='Partie',  translate=True)
     marque_onduleur_id = fields.Many2one('marque.onduleur', string='Marque Onduleur')
-    code_alarm = fields.Char(string='Code Alarm', required=True, translate=True)
+    code_alarm = fields.Char(string='Code Alarm', translate=True)
+    
 
     # Nouveaux champs pour le plan d'action IA
     action_plan_html = fields.Html(string='Plan d\'action IA', translate=True)
