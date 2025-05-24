@@ -5,29 +5,69 @@
         <field name="model">alarm.management</field>
         <field name="arch" type="xml">
             <form>
-                <header>
-                    <button name="action_generate_action_plan" string="Générer Plan d'Action IA"
-                            type="object" class="oe_highlight" icon="fa-lightbulb-o" onclick="this.innerHTML='⏳ Génération...'; this.disabled=true; setTimeout(function(){ location.reload(); }, 3000);"/>
-                    <button name="action_debug_openai" string="🔍 Debug OpenAI"
-        type="object" class="btn-warning"/>
+                  <header>
+                    <button name="action_generate_action_plan"
+                            string="Générer Plan d'Action IA"
+                            type="object"
+                            class="oe_highlight"
+                            icon="fa-lightbulb-o"
+                            onclick="this.innerHTML='⏳ Génération...'; this.disabled=true;"/>
+
+                    <button name="action_debug_openai"
+                            string="🔍 Debug OpenAI"
+                            type="object"
+                            class="btn-warning"
+                            onclick="this.innerHTML='🔄 Test...'; this.disabled=true;"/>
                 </header>
                 <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Nom de l'alarme"/>
+                        </h1>
+                    </div>
+
                     <group>
-                        <field name="name"/>
-                        <field name="partie"/>
-                        <field name="marque_onduleur_id" attrs="{'invisible': [('partie', '!=', 'onduleur')], 'required': [('partie', '=', 'onduleur')]}"/>
-                        <field name="code_alarm"/>
-                        <field name="action_plan_severity" attrs="{'invisible': [('action_plan_html', '=', False)]}"/>
-                        <field name="action_plan_resolution_time" attrs="{'invisible': [('action_plan_html', '=', False)]}" widget="float_time"/>
-                        <field name="requires_specialist" attrs="{'invisible': [('action_plan_html', '=', False)]}"/>
-                        <field name="last_action_plan_date" attrs="{'invisible': [('action_plan_html', '=', False)]}"/>
+                        <group string="Informations de base">
+                            <field name="partie"/>
+                            <field name="marque_onduleur_id"
+                                   attrs="{'invisible': [('partie', '!=', 'onduleur')], 'required': [('partie', '=', 'onduleur')]}"/>
+                            <field name="code_alarm"/>
+                            <field name="severity"/>
+                            <field name="category"/>
+                        </group>
+                        <group string="Statistiques" attrs="{'invisible': [('occurrence_count', '=', 0)]}">
+                            <field name="occurrence_count"/>
+                            <field name="last_occurrence_date"/>
+                            <field name="avg_resolution_time" widget="float_time"/>
+                            <field name="resolution_rate" widget="percentage"/>
+                        </group>
                     </group>
-                    <notebook attrs="{'invisible': [('action_plan_html', '=', False)]}">
-                        <page string="Plan d'Action IA">
+
+                    <notebook>
+                        <page string="Description">
+                            <field name="description" placeholder="Description détaillée de l'alarme..."/>
+                        </page>
+
+                        <page string="Plan d'Action IA" attrs="{'invisible': [('action_plan_html', '=', False)]}">
+                            <group>
+                                <group>
+                                    <field name="action_plan_severity"/>
+                                    <field name="action_plan_resolution_time" widget="float_time"/>
+                                </group>
+                                <group>
+                                    <field name="requires_specialist"/>
+                                    <field name="last_action_plan_date"/>
+                                </group>
+                            </group>
                             <field name="action_plan_html" widget="html" nolabel="1"/>
                         </page>
                     </notebook>
                 </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
             </form>
         </field>
     </record>
@@ -37,11 +77,16 @@
         <field name="name">alarm.management.tree</field>
         <field name="model">alarm.management</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree decoration-info="severity == 'info'"
+                  decoration-warning="severity == 'warning'"
+                  decoration-danger="severity in ('error', 'critical')">
                 <field name="name"/>
-                <field name="partie"/>
-                <field name="marque_onduleur_id"/>
                 <field name="code_alarm"/>
+                <field name="partie"/>
+                <field name="severity"/>
+                <field name="category"/>
+                <field name="occurrence_count"/>
+                <field name="marque_onduleur_id"/>
                 <field name="action_plan_severity"/>
             </tree>
         </field>
@@ -55,11 +100,28 @@
             <search>
                 <field name="name"/>
                 <field name="code_alarm"/>
+                <field name="description"/>
                 <field name="partie"/>
+                <field name="marque_onduleur_id"/>
+                <field name="category"/>
                 <separator/>
-                <filter string="Onduleur Alarms" name="filter_partie_onduleur" domain="[('partie','=','onduleur')]"/>
-                <filter string="Module Alarms" name="filter_partie_module" domain="[('partie','=','module')]"/>
-                <group expand="0" string="Group By">
+                <!-- Filters by severity -->
+                <filter string="Critique" name="filter_critical" domain="[('severity','=','critical')]"/>
+                <filter string="Erreur" name="filter_error" domain="[('severity','=','error')]"/>
+                <filter string="Avertissement" name="filter_warning" domain="[('severity','=','warning')]"/>
+                <filter string="Information" name="filter_info" domain="[('severity','=','info')]"/>
+                <separator/>
+                <!-- Filters by part -->
+                <filter string="Onduleur" name="filter_partie_onduleur" domain="[('partie','=','onduleur')]"/>
+                <filter string="Module" name="filter_partie_module" domain="[('partie','=','module')]"/>
+                <filter string="Installation" name="filter_partie_installation" domain="[('partie','=','installation')]"/>
+                <separator/>
+                <!-- Filters for AI plan -->
+                <filter string="Avec plan IA" name="filter_with_ai_plan" domain="[('action_plan_html','!=',False)]"/>
+                <filter string="Sans plan IA" name="filter_without_ai_plan" domain="[('action_plan_html','=',False)]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter name="group_by_severity" string="Sévérité" context="{'group_by': 'severity'}"/>
+                    <filter name="group_by_category" string="Catégorie" context="{'group_by': 'category'}"/>
                     <filter name="group_by_partie" string="Partie" context="{'group_by': 'partie'}"/>
                     <filter name="group_by_marque" string="Marque" context="{'group_by': 'marque_onduleur_id'}"/>
                 </group>
@@ -67,16 +129,22 @@
         </field>
     </record>
 
-
-
     <!-- Actions -->
     <record id="action_alarm_management" model="ir.actions.act_window">
         <field name="name">Gestion des Alarmes</field>
         <field name="res_model">alarm.management</field>
         <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_alarm_management_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créez votre première alarme
+            </p>
+            <p>
+                Gérez les codes d'alarme de vos installations PV avec l'aide de l'intelligence artificielle
+                pour générer des plans d'action détaillés.
+            </p>
+        </field>
     </record>
-
-
 
     <!-- Menus -->
     <menuitem id="menu_alarm_management" name="Gestion des Alarmes" parent="menu_pv_root" action="action_alarm_management"/>
