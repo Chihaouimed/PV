@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extend HR Employee Form View to add AI Analysis -->
+    <record id="view_hr_employee_form_pv_analysis" model="ir.ui.view">
+        <field name="name">hr.employee.form.pv.analysis</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <!-- Add evaluation count button to button box -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_evaluations"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-star">
+                    <field name="evaluation_count" widget="statinfo" string="Évaluations"/>
+                </button>
+            </xpath>
+
+            <!-- Add AI Analysis tab to notebook -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Analyse IA Performance">
+                    <group>
+                        <group string="Actions">
+                            <button name="action_test_ai_simple"
+                                    string="Test IA (Simple)"
+                                    type="object"
+                                    class="btn-info"/>
+                            <button name="action_analyze_performance_ai"
+                                    string="Analyser Performance IA"
+                                    type="object"
+                                    class="oe_highlight"
+                                    attrs="{'invisible': [('evaluation_count', '=', 0)]}"
+                                    confirm="Voulez-vous lancer l'analyse IA pour ce technicien?"/>
+                            <button name="action_view_evaluations"
+                                    string="Voir toutes les évaluations"
+                                    type="object"
+                                    class="oe_link"
+                                    attrs="{'invisible': [('evaluation_count', '=', 0)]}"/>
+                        </group>
+                        <group string="Résultats">
+                            <field name="evaluation_count" readonly="1"/>
+                            <field name="performance_rating"/>
+                            <field name="last_ai_analysis_date"/>
+                        </group>
+                    </group>
+
+                    <separator string="Analyse IA"/>
+
+                    <!-- Show AI analysis if exists -->
+                    <group attrs="{'invisible': [('ai_analysis_html', '=', False)]}">
+                        <field name="ai_analysis_html" widget="html" nolabel="1"/>
+                    </group>
+
+                    <!-- Show message if no analysis -->
+                    <group attrs="{'invisible': [('ai_analysis_html', '!=', False)]}">
+                        <div class="alert alert-info" role="alert">
+                            <h4>Aucune analyse disponible</h4>
+                            <p><strong>Test:</strong> Cliquez sur "Test IA (Simple)" pour vérifier que l'intégration fonctionne.</p>
+                            <p><strong>Analyse réelle:</strong> Cliquez sur "Analyser Performance IA" pour une analyse basée sur les évaluations.</p>
+                            <p><strong>Prérequis pour l'analyse réelle:</strong> Le technicien doit avoir au moins une évaluation.</p>
+                        </div>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Tree view specifically for technician analysis -->
+    <record id="view_hr_employee_tree_pv_analysis" model="ir.ui.view">
+        <field name="name">hr.employee.tree.pv.analysis</field>
+        <field name="model">hr.employee</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="department_id"/>
+                <field name="evaluation_count"/>
+                <field name="performance_rating"/>
+                <field name="last_ai_analysis_date"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Create dedicated action for technician analysis -->
+    <record id="action_technician_performance_analysis" model="ir.actions.act_window">
+        <field name="name">Analyse Performance Techniciens IA</field>
+        <field name="res_model">hr.employee</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+                                      (0, 0, {'view_mode': 'tree', 'view_id': ref('view_hr_employee_tree_pv_analysis')}),
+                                      (0, 0, {'view_mode': 'form', 'view_id': ref('view_hr_employee_form_pv_analysis')})]"/>
+        <field name="domain">[('evaluation_count', '>', 0)]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Aucun technicien avec évaluations trouvé
+            </p>
+            <p>
+                Les techniciens ayant des évaluations apparaîtront ici pour analyse IA.
+            </p>
+        </field>
+    </record>
+</odoo>

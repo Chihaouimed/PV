@@ -19,6 +19,7 @@
         'views/evaluation_views.xml',
         'views/fiche_reponse_views.xml',
         'views/calibre_disj_views.xml',
+        'views/hr_employee_views.xml',
         'views/configuration_menu.xml',
         'data/system_parameters.xml',
     ],

@@ -17,7 +17,7 @@ class PVOpenAIService(models.AbstractModel):
         """Récupérer la clé API OpenAI"""
         try:
             api_key = self.env['ir.config_parameter'].sudo().get_param('pv_management.openai_api_key')
-            if not api_key or api_key in ['YOUR_API_KEY_HERE', 'YOUR_REAL_API_KEY_HERE']:
+            if not api_key or api_key in ['YOUR_API_KEY_HERE', 'YOUR_REAL_API_KEY_HERE', 'api key']:
                 _logger.warning("Clé API OpenAI non configurée")
                 return False
             return api_key
@@ -104,6 +104,334 @@ class PVOpenAIService(models.AbstractModel):
         except Exception as e:
             _logger.error(f"Erreur lors de la requête OpenAI: {str(e)}")
             return False
+
+    @api.model
+    def analyze_technician_performance(self, technician_id):
+        """
+        Analyze technician evaluations and provide improvement recommendations
+        """
+        try:
+            _logger.info(f"Starting technician analysis for ID: {technician_id}")
+
+            # Get all evaluations for this technician
+            evaluations = self.env['pv.evaluation'].search([
+                ('technicien_id', '=', technician_id)
+            ])
+
+            if not evaluations:
+                return {
+                    'success': False,
+                    'message': 'Aucune évaluation trouvée pour ce technicien'
+                }
+
+            # Prepare evaluation data
+            eval_data = {
+                'technician_name': evaluations[0].technicien_id.name,
+                'total_evaluations': len(evaluations),
+                'evaluations': []
+            }
+
+            # Collect evaluation details
+            for evaluation in evaluations:
+                eval_info = {
+                    'date': str(evaluation.date_evaluation),
+                    'technician_rating': evaluation.technician_rating,
+                    'technical_knowledge': evaluation.technician_knowledge,
+                    'professionalism': evaluation.technician_professionalism,
+                    'communication': evaluation.technician_communication,
+                    'feedback': evaluation.technician_feedback or 'Aucun commentaire'
+                }
+                eval_data['evaluations'].append(eval_info)
+
+            # Try AI analysis first, fallback to simple analysis if it fails
+            api_key = self._get_api_key()
+            if api_key:
+                # Create AI prompt
+                system_prompt = """
+                Tu es un expert en ressources humaines spécialisé dans l'évaluation des techniciens.
+                Analyse les évaluations d'un technicien et fournis des conseils d'amélioration pratiques.
+
+                Réponds UNIQUEMENT avec un objet JSON dans ce format:
+                {
+                    "overall_rating": "excellent|good|average|needs_improvement",
+                    "strengths": ["Point fort 1", "Point fort 2"],
+                    "areas_for_improvement": ["Domaine 1", "Domaine 2"],
+                    "specific_recommendations": [
+                        {
+                            "area": "Communication",
+                            "current_level": "average", 
+                            "recommendation": "Conseil spécifique",
+                            "action_plan": "Plan d'action concret"
+                        }
+                    ],
+                    "training_suggestions": ["Formation 1", "Formation 2"],
+                    "priority_focus": "Le domaine le plus important à améliorer",
+                    "summary": "Résumé en 2-3 phrases"
+                }
+                """
+
+                user_prompt = f"""
+                ANALYSE DU TECHNICIEN: {eval_data['technician_name']}
+
+                Nombre total d'évaluations: {eval_data['total_evaluations']}
+
+                Détails des évaluations:
+                """
+
+                for i, evaluation in enumerate(eval_data['evaluations'], 1):
+                    user_prompt += f"""
+
+                Évaluation {i} ({evaluation['date']}):
+                - Note globale: {evaluation['technician_rating']}
+                - Connaissances techniques: {evaluation['technical_knowledge']}
+                - Professionnalisme: {evaluation['professionalism']}
+                - Communication: {evaluation['communication']}
+                - Commentaires: {evaluation['feedback']}
+                    """
+
+                user_prompt += """
+
+                Fournis une analyse complète avec des recommandations d'amélioration spécifiques et actionnables.
+                """
+
+                messages = [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt}
+                ]
+
+                # Make OpenAI request
+                response = self._make_openai_request(messages)
+
+                if response:
+                    try:
+                        analysis = json.loads(response)
+                        analysis['html_content'] = self._format_technician_analysis_html(analysis, eval_data)
+                        return {
+                            'success': True,
+                            'analysis': analysis
+                        }
+                    except json.JSONDecodeError:
+                        pass  # Will fallback to simple analysis
+
+            # Fallback to simple analysis
+            return self._get_fallback_technician_analysis(eval_data)
+
+        except Exception as e:
+            _logger.error(f"Erreur analyse technicien: {str(e)}")
+            return {
+                'success': False,
+                'message': f'Erreur technique: {str(e)}'
+            }
+
+    @api.model
+    def _get_fallback_technician_analysis(self, eval_data):
+        """Fallback analysis if AI fails"""
+        _logger.info("Génération du plan de secours pour l'analyse technicien")
+
+        evaluations = eval_data['evaluations']
+
+        # Calculate averages
+        ratings = {
+            'technician_rating': [],
+            'technical_knowledge': [],
+            'professionalism': [],
+            'communication': []
+        }
+
+        for evaluation in evaluations:
+            for field in ratings.keys():
+                value = evaluation.get(field)
+                if value in ['excellent', 'good', 'average', 'poor']:
+                    score = {'excellent': 4, 'good': 3, 'average': 2, 'poor': 1}[value]
+                    ratings[field].append(score)
+
+        # Determine weak areas
+        weak_areas = []
+        strengths = []
+
+        for field, scores in ratings.items():
+            if scores:
+                avg = sum(scores) / len(scores)
+                field_name = {
+                    'technician_rating': 'Performance globale',
+                    'technical_knowledge': 'Connaissances techniques',
+                    'professionalism': 'Professionnalisme',
+                    'communication': 'Communication'
+                }[field]
+
+                if avg < 2.5:
+                    weak_areas.append(field_name)
+                elif avg > 3.5:
+                    strengths.append(field_name)
+
+        # Determine overall rating
+        all_scores = []
+        for scores in ratings.values():
+            all_scores.extend(scores)
+
+        if all_scores:
+            overall_avg = sum(all_scores) / len(all_scores)
+            if overall_avg >= 3.5:
+                overall_rating = 'excellent'
+            elif overall_avg >= 2.5:
+                overall_rating = 'good'
+            elif overall_avg >= 1.5:
+                overall_rating = 'average'
+            else:
+                overall_rating = 'needs_improvement'
+        else:
+            overall_rating = 'average'
+
+        analysis = {
+            'overall_rating': overall_rating,
+            'strengths': strengths or ['Expérience terrain', 'Ponctualité'],
+            'areas_for_improvement': weak_areas or ['Communication client'],
+            'specific_recommendations': [
+                {
+                    'area': weak_areas[0] if weak_areas else 'Développement général',
+                    'current_level': overall_rating,
+                    'recommendation': 'Formation ciblée recommandée pour améliorer les compétences',
+                    'action_plan': 'Planifier des sessions de formation dans les 30 prochains jours'
+                }
+            ],
+            'training_suggestions': ['Formation technique PV', 'Communication client', 'Gestion du temps'],
+            'priority_focus': weak_areas[0] if weak_areas else 'Maintenir le niveau actuel',
+            'summary': f'Basé sur {len(evaluations)} évaluations. Note moyenne: {overall_avg:.1f}/4. Focus recommandé sur {weak_areas[0] if weak_areas else "le maintien du niveau actuel"}.'
+        }
+
+        analysis['html_content'] = self._format_technician_analysis_html(analysis, eval_data)
+
+        return {
+            'success': True,
+            'analysis': analysis
+        }
+
+    @api.model
+    def _format_technician_analysis_html(self, analysis, eval_data):
+        """Format technician analysis as HTML"""
+
+        # Rating color mapping
+        rating_colors = {
+            'excellent': '#28a745',
+            'good': '#17a2b8',
+            'average': '#ffc107',
+            'needs_improvement': '#dc3545'
+        }
+
+        color = rating_colors.get(analysis.get('overall_rating', 'average'), '#ffc107')
+
+        html = f"""
+        <div style="font-family: 'Segoe UI', sans-serif; max-width: 100%; background: #f8f9fa; padding: 20px; border-radius: 12px;">
+
+            <!-- Header -->
+            <div style="background: linear-gradient(135deg, {color}15, {color}05); padding: 20px; border-radius: 8px; border-left: 5px solid {color}; margin-bottom: 20px;">
+                <h2 style="color: #2c3e50; margin: 0;">🔍 Analyse Performance Technicien</h2>
+                <p style="color: #666; margin: 5px 0 0 0;">
+                    {eval_data['technician_name']} • {eval_data['total_evaluations']} évaluations analysées
+                </p>
+                <div style="margin-top: 10px;">
+                    <span style="background: {color}; color: white; padding: 6px 12px; border-radius: 20px; font-weight: bold;">
+                        {analysis.get('overall_rating', 'average').upper()}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div style="background: white; padding: 20px; margin: 15px 0; border-radius: 8px; border-left: 4px solid #17a2b8;">
+                <h3 style="color: #2c3e50; margin-top: 0;">📋 Résumé</h3>
+                <p style="margin: 0; line-height: 1.6; font-size: 16px;">{analysis.get('summary', '')}</p>
+            </div>
+
+            <!-- Strengths -->
+            <div style="background: white; padding: 20px; margin: 15px 0; border-radius: 8px;">
+                <h3 style="color: #2c3e50; margin-top: 0;">✅ Points Forts</h3>
+                <div style="background: #d4edda; padding: 15px; border-radius: 6px; border-left: 3px solid #28a745;">
+                    <ul style="margin: 0; padding-left: 20px;">
+        """
+
+        for strength in analysis.get('strengths', []):
+            html += f"<li style='margin-bottom: 5px; color: #155724;'>{strength}</li>"
+
+        html += """
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Areas for Improvement -->
+            <div style="background: white; padding: 20px; margin: 15px 0; border-radius: 8px;">
+                <h3 style="color: #2c3e50; margin-top: 0;">⚠️ Domaines d'Amélioration</h3>
+                <div style="background: #fff3cd; padding: 15px; border-radius: 6px; border-left: 3px solid #ffc107;">
+                    <ul style="margin: 0; padding-left: 20px;">
+        """
+
+        for area in analysis.get('areas_for_improvement', []):
+            html += f"<li style='margin-bottom: 5px; color: #856404;'>{area}</li>"
+
+        html += """
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Specific Recommendations -->
+            <div style="background: white; padding: 20px; margin: 15px 0; border-radius: 8px;">
+                <h3 style="color: #2c3e50; margin-top: 0;">🎯 Recommandations Spécifiques</h3>
+        """
+
+        for rec in analysis.get('specific_recommendations', []):
+            html += f"""
+                <div style="border: 1px solid #e9ecef; border-radius: 8px; padding: 15px; margin: 10px 0; background: #fdfdfd;">
+                    <h4 style="color: #495057; margin: 0 0 10px 0;">{rec.get('area', '')}</h4>
+                    <div style="margin-bottom: 8px;">
+                        <strong>Niveau actuel:</strong> 
+                        <span style="background: #e9ecef; padding: 2px 8px; border-radius: 4px; font-size: 12px;">
+                            {rec.get('current_level', '').upper()}
+                        </span>
+                    </div>
+                    <div style="margin-bottom: 8px;">
+                        <strong>Recommandation:</strong> {rec.get('recommendation', '')}
+                    </div>
+                    <div style="background: #e8f4f8; padding: 10px; border-radius: 4px;">
+                        <strong>Plan d'action:</strong> {rec.get('action_plan', '')}
+                    </div>
+                </div>
+            """
+
+        html += """
+            </div>
+
+            <!-- Training Suggestions -->
+            <div style="background: white; padding: 20px; margin: 15px 0; border-radius: 8px;">
+                <h3 style="color: #2c3e50; margin-top: 0;">📚 Formations Suggérées</h3>
+                <div style="background: #e3f2fd; padding: 15px; border-radius: 6px; border-left: 3px solid #2196f3;">
+                    <ul style="margin: 0; padding-left: 20px;">
+        """
+
+        for training in analysis.get('training_suggestions', []):
+            html += f"<li style='margin-bottom: 5px; color: #1565c0;'>{training}</li>"
+
+        html += f"""
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Priority Focus -->
+            <div style="background: #fff8e1; padding: 20px; margin: 15px 0; border-radius: 8px; border-left: 4px solid #ff9800;">
+                <h3 style="color: #2c3e50; margin-top: 0;">🔥 Priorité Focus</h3>
+                <p style="margin: 0; font-size: 16px; font-weight: 500; color: #e65100;">
+                    {analysis.get('priority_focus', '')}
+                </p>
+            </div>
+
+            <!-- Footer -->
+            <div style="background: #f8f9fa; padding: 15px; margin-top: 20px; border-radius: 8px; text-align: center; font-size: 12px; color: #666;">
+                📊 Analyse générée par IA • Basée sur {eval_data['total_evaluations']} évaluations
+            </div>
+        </div>
+        """
+
+        return html
+
+    # ========== ORIGINAL ALARM METHODS - KEEPING YOUR PREFERRED STYLE ==========
 
     @api.model
     def generate_alarm_action_plan(self, alarm_data):
@@ -225,7 +553,7 @@ class PVOpenAIService(models.AbstractModel):
             # Validation et enrichissement
             action_plan = self._validate_and_enrich_action_plan(action_plan, alarm_data)
 
-            # Génération du HTML enrichi
+            # Génération du HTML enrichi - USING YOUR ORIGINAL FORMAT
             action_plan['html_content'] = self._format_enhanced_action_plan_html(action_plan, alarm_data)
 
             return action_plan
@@ -375,7 +703,7 @@ class PVOpenAIService(models.AbstractModel):
         return plan
 
     def _format_enhanced_action_plan_html(self, action_plan, alarm_data):
-        """Formate le plan d'action enrichi en HTML"""
+        """Formate le plan d'action enrichi en HTML - VOTRE FORMAT ORIGINAL PRÉFÉRÉ"""
         severity_colors = {
             'low': '#28a745',
             'medium': '#ffc107',
@@ -615,4 +943,3 @@ class PVOpenAIService(models.AbstractModel):
 
         _logger.info("✅ DEBUG COMPLET ENRICHI RÉUSSI")
         return f"✅ Succès: Plan enrichi généré avec {len(plan.get('action_steps', []))} étapes, confiance {plan.get('confidence_score', 0)}%"
-
