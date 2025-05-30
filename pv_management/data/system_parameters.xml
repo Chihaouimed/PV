@@ -2,7 +2,7 @@
     <data noupdate="1">
         <record id="openai_api_key_param" model="ir.config_parameter">
             <field name="key">pv_management.openai_api_key</field>
-            <field name="value">apikey</field>
+            <field name="value">api</field>
         </record>
     <!-- Configuration du cache -->
         <record id="ai_cache_duration_param" model="ir.config_parameter">

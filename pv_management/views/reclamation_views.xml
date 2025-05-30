@@ -37,12 +37,6 @@
                         </group>
                     </group>
                     <notebook>
-                        <page string="Description">
-                            <field name="description" placeholder="Détails de la réclamation..."/>
-                        </page>
-                        <page string="Cause de l'alarme">
-                            <field name="cause_alarme" placeholder="Explication de la cause de l'alarme..."/>
-                        </page>
                         <page string="Fiches d'intervention" attrs="{'invisible': [('intervention_ids', '=', [])]}">
                             <field name="intervention_ids" readonly="1">
                                 <tree>

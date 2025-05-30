@@ -34,7 +34,7 @@ class FicheIntervention(models.Model):
     installation_id = fields.Many2one('pv.installation', string='Installation', readonly=True)
     adresse = fields.Char(string='Adresse', readonly=True)
     reclamation_id = fields.Many2one('reclamation', string='Réclamation associée', readonly=True)
-    code_alarm_id = fields.Char(string='Code Alarm' , readonly=True)
+    code_alarm_id = fields.Char(string='Code Alarme' , readonly=True)
 
 
     # Fiches de réponse liées

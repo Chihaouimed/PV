@@ -15,15 +15,13 @@ class Reclamation(models.Model):
     client_id = fields.Many2one('res.partner', string='Client')
     nom_central_id = fields.Many2one('pv.installation', string='Nom Instalation')
     adresse = fields.Char(related='nom_central_id.address_id', string='Adresse', readonly=True)
-    description = fields.Text(string='Description', required=True)
-    code_alarm_id = fields.Many2one('alarm.management', string='Code Alarm')
+    code_alarm_id = fields.Many2one('alarm.management', string='Code Alarme')
     priorite_urgence = fields.Selection([
         ('basse', 'Basse'),
         ('moyenne', 'Moyenne'),
         ('haute', 'Haute')
     ], string='Priorité d\'urgence')
     date_disponibilite = fields.Datetime(string='Date de disponibilité', required=True, default=fields.Datetime.now)
-    cause_alarme = fields.Text(string='Cause de l\'Alarme')
 
 
     # Champ pour lier à fiche.intervention (si ce modèle existe ou sera créé)

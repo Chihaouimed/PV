@@ -4,16 +4,18 @@
 
     <menuitem id="menu_pv_module" name="Modules" parent="menu_configuration_root" action="action_pv_module"/>
     <menuitem id="menu_pv_inverter" name="Onduleurs" parent="menu_configuration_root" action="action_pv_inverter"/>
-    <menuitem id="menu_marque_onduleur" name="Marques d'Onduleur" parent="menu_configuration_root" action="action_marque_onduleur"/>
-    <menuitem id="menu_alarm_management" name="Gestion des Alarmes" parent="menu_configuration_root" action="action_alarm_management"/>
-    <menuitem id="menu_configuration_district_steg" name="Districts STEG" parent="menu_configuration_root" action="action_configuration_district_steg"/>
-    <menuitem id="menu_calibre_disj" name="Calibre Disjoncteur" parent="menu_configuration_root" action="action_calibre_disj"/>
+    <menuitem id="menu_marque_onduleur" name="Marques d'Onduleur" parent="menu_configuration_root"
+              action="action_marque_onduleur"/>
+    <menuitem id="menu_alarm_management" name="Gestion des Alarmes" parent="menu_configuration_root"
+              action="action_alarm_management"/>
+    <menuitem id="menu_configuration_district_steg" name="Districts STEG" parent="menu_configuration_root"
+              action="action_configuration_district_steg"/>
+    <menuitem id="menu_calibre_disj" name="Calibre Disjoncteur" parent="menu_configuration_root"
+              action="action_calibre_disj"/>
 
-     <!-- AI Analysis Menu -->
+    <!-- AI Analysis Menu -->
     <menuitem id="menu_ai_analysis_root" name="Analyse IA" parent="menu_pv_root" sequence="60"/>
-    <menuitem id="menu_technician_analysis"
-              name="Performance Techniciens"
-              parent="menu_ai_analysis_root"
-              action="action_technician_performance_analysis"
-              sequence="10"/>
+
+    <menuitem id="menu_technician_analysis" name="Performance Techniciens" parent="menu_ai_analysis_root"
+              action="action_technician_performance_analysis"/>
 </odoo>
