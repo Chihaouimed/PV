@@ -5,17 +5,12 @@ class PVInverter(models.Model):
     _description = 'PV Inverter'
 
     # Inverter 1
-    reference_onduleur_pv_id = fields.Char(string='Reference Onduleur PV', required=True, readonly=True, copy=False,default=lambda self: self.env['ir.sequence'].next_by_code('pv.inverter.sequence') or 'New')
+    reference_onduleur_pv_id = fields.Char(string='Reference Onduleur PV', required=True, copy=False)
     marque_onduleur_pv_id = fields.Many2one('marque.onduleur', string='Marque Onduleur PV')
     puissance_onduleur_pv = fields.Char(string='Puissance Onduleur (KVA)')
     calibre_disjoncteur_onduleur_pv = fields.Many2one('configuration.district.steg' , string='Calibre Disjoncteur (A)')
     puissance_totale_ag = fields.Char(string='Puissance Totale AG (KVA)')
 
-    @api.model
-    def create(self, vals):
-        if vals.get('reference_onduleur_pv_id', 'New') == 'New':
-            vals['reference_onduleur_pv_id'] = self.env['ir.sequence'].next_by_code('pv.inverter.sequence') or 'New'
-        return super(PVInverter, self).create(vals)
 
     # Add name_get method for better display in selection fields
     def name_get(self):

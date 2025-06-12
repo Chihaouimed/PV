@@ -16,12 +16,27 @@ class Evaluation(models.Model):
                                       domain="[('client', '=', client_id)]")
     date_evaluation = fields.Date(string='Evaluation Date', default=fields.Date.today, required=True)
 
-
     # Link to intervention
     intervention_id = fields.Many2one('fiche.intervention', string='Intervention',
-                                      domain="[('installation_id', '=', installation_id)]", readonly="True")
-    technicien_id = fields.Many2one(related='intervention_id.technicien_id', string='Technician', readonly=True,
-                                    store=True)
+                                      domain="[('installation_id', '=', installation_id)]", readonly=True)
+
+    # FIX: Make sure technicien_id is properly linked and stored
+    technicien_id = fields.Many2one(
+        'hr.employee',
+        string='Technician',
+        compute='_compute_technicien_id',
+        store=True,  # Important: store the value so it can be searched
+        readonly=True
+    )
+
+    @api.depends('intervention_id', 'intervention_id.technicien_id')
+    def _compute_technicien_id(self):
+        """Compute technician from intervention"""
+        for record in self:
+            if record.intervention_id and record.intervention_id.technicien_id:
+                record.technicien_id = record.intervention_id.technicien_id
+            else:
+                record.technicien_id = False
 
     # Technical evaluation fields for installation
     performance_ratio = fields.Selection([
@@ -35,13 +50,13 @@ class Evaluation(models.Model):
         ('good', 'Good'),
         ('average', 'Average'),
         ('poor', 'Poor')
-    ],string='Energy Produced (kWh)')
+    ], string='Energy Produced (kWh)')
     system_efficiency = fields.Selection([
         ('excellent', 'Excellent'),
         ('good', 'Good'),
         ('average', 'Average'),
         ('poor', 'Poor')
-    ],string='System Efficiency (%)')
+    ], string='System Efficiency (%)')
 
     # Maintenance evaluation for installation
     panel_condition = fields.Selection([
@@ -108,7 +123,36 @@ class Evaluation(models.Model):
     def create(self, vals):
         if vals.get('name', 'New') == 'New':
             vals['name'] = self.env['ir.sequence'].next_by_code('pv.evaluation.sequence') or 'New'
-        return super(Evaluation, self).create(vals)
+        result = super(Evaluation, self).create(vals)
+
+        # FIX: After creation, trigger recompute of evaluation count for technician
+        if result.technicien_id:
+            result.technicien_id._compute_evaluation_count()
+
+        return result
+
+    def write(self, vals):
+        result = super(Evaluation, self).write(vals)
+
+        # FIX: If technician changed, recompute counts for both old and new technicians
+        if 'technicien_id' in vals or 'intervention_id' in vals:
+            for record in self:
+                if record.technicien_id:
+                    record.technicien_id._compute_evaluation_count()
+
+        return result
+
+    def unlink(self):
+        # FIX: Before deletion, remember technicians to update their counts
+        technicians_to_update = self.mapped('technicien_id')
+        result = super(Evaluation, self).unlink()
+
+        # Update counts after deletion
+        for technician in technicians_to_update:
+            if technician.exists():  # Check if technician still exists
+                technician._compute_evaluation_count()
+
+        return result
 
     @api.onchange('client_id')
     def _onchange_client_id(self):

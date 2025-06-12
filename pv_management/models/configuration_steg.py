@@ -4,7 +4,7 @@ class Calibredisj(models.Model):
     _name = 'calibre.disj'
     _description = 'Calibre Disjoncteur'
 
-    name = fields.Char(string='Nom', required=True, translate=True)
+    name = fields.Char(string='Calibre', required=True, translate=True)
     code = fields.Char(string='Intensité', translate=True)
 
 

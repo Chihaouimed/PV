@@ -29,7 +29,6 @@
                                     string="Analyser Performance IA"
                                     type="object"
                                     class="oe_highlight"
-                                    attrs="{'invisible': [('evaluation_count', '=', 0)]}"
                                     confirm="Voulez-vous lancer l'analyse IA pour ce technicien?"/>
                             <button name="action_view_evaluations"
                                     string="Voir toutes les évaluations"

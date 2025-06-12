@@ -16,19 +16,20 @@ class HrEmployee(models.Model):
         ('needs_improvement', 'À améliorer')
     ], string='Évaluation IA', readonly=True)
 
-    # Count evaluations
+    # Count evaluations - FIX: Remove depends and store=True, make it compute-only
     evaluation_count = fields.Integer(
         string='Nombre d\'évaluations',
-        compute='_compute_evaluation_count',
-        store=True
+        compute='_compute_evaluation_count'
     )
 
-    @api.depends('name')
+    # FIX: Correct the compute method
     def _compute_evaluation_count(self):
         for employee in self:
-            employee.evaluation_count = self.env['pv.evaluation'].search_count([
+            # Search for evaluations where this employee is the technician
+            count = self.env['pv.evaluation'].search_count([
                 ('technicien_id', '=', employee.id)
             ])
+            employee.evaluation_count = count
 
     def action_analyze_performance_ai(self):
         """
@@ -97,13 +98,14 @@ class HrEmployee(models.Model):
             'context': {'default_technicien_id': self.id}
         }
 
-    # Add this test method to pv_management/models/hr_employee.py
-
     def action_test_ai_simple(self):
         """
         Simple test function to verify AI analysis is working
         """
         self.ensure_one()
+
+        # Force recompute evaluation count
+        self._compute_evaluation_count()
 
         # Simple test without AI - just to verify the button works
         test_html = f"""

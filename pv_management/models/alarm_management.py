@@ -18,7 +18,7 @@ class AlarmManagement(models.Model):
         ('autre', 'Autre')
     ], string='Partie', translate=True)
     marque_onduleur_id = fields.Many2one('marque.onduleur', string='Marque Onduleur')
-    code_alarm = fields.Char(string='Code Alarm', translate=True)
+    code_alarm = fields.Char(string='Code Alarme', translate=True)
 
     # Enhanced description field
     description = fields.Text(string='Description', translate=True, help="Description détaillée de l'alarme")
@@ -132,7 +132,7 @@ class AlarmManagement(models.Model):
 
                 record.avg_resolution_time = total_time / resolved_count if resolved_count > 0 else 0.0
                 record.resolution_rate = (
-                            resolved_count / total_interventions * 100) if total_interventions > 0 else 0.0
+                            resolved_count / total_interventions * 100)/100  if total_interventions > 0 else 0.0
             except:
                 record.avg_resolution_time = 0.0
                 record.resolution_rate = 0.0

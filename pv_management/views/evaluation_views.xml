@@ -26,7 +26,7 @@
                         </group>
                         <group>
                             <field name="intervention_id" options="{'no_create': True}"/>
-                            <field name="technicien_id"/>
+                            <field name="technicien_id" readonly="1"/>
                         </group>
                     </group>
                     <notebook>
@@ -42,12 +42,8 @@
                                     <field name="inverter_condition"/>
                                 </group>
                             </group>
-                            <!--<group string="Issues and Recommendations">
-                                <field name="issues_found" placeholder="Describe any issues found during evaluation..."/>
-                                <field name="recommendations" placeholder="Provide recommendations based on the evaluation..."/>
-                            </group>-->
                         </page>
-                        <page string="Technician Evaluation" attrs="{'invisible': [('technicien_id', '=', True)]}">
+                        <page string="Technician Evaluation">
                             <group>
                                 <group string="Rating">
                                     <field name="technician_rating"/>
